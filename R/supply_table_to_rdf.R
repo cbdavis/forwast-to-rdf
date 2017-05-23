@@ -1,3 +1,5 @@
+#' @import dplyr
+#' @import tidyr
 supply_table_to_rdf <- function(store, country, year, file_name, sheet_name, cell_range, prefixes){
   
   product_prefix = prefixes$product_prefix
@@ -9,11 +11,13 @@ supply_table_to_rdf <- function(store, country, year, file_name, sheet_name, cel
     supply_table_type = "Physical_Supply_Table_Dry"
   } else if (sheet_name == "V'T and UT data entry"){    
     supply_table_type = "Physical_Supply_Table_Wet"
+  } else if (sheet_name == "P"){    
+    supply_table_type = "Price_Supply_Table"
   } else {
     stop("Not sure which type of supply table (monetary or physical) will be processed")
   }
   
-  supply_table = read_xls(file_name, sheet=sheet_name, range=cell_range, col_names=FALSE)
+  supply_table = readxl::read_xls(file_name, sheet=sheet_name, range=cell_range, col_names=FALSE)
   
   non_zero_indices_supply_table = which(supply_table != 0, arr.ind=TRUE)
   
@@ -34,17 +38,17 @@ supply_table_to_rdf <- function(store, country, year, file_name, sheet_name, cel
                         year, 
                         "/", supply_table_type)
   
-  add.triple(store,
+  rrdf::add.triple(store,
              subject=supply_table,
              predicate = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
              object = paste0("http://bonsai.uno/data/FORWAST/", supply_table_type))
   
-  add.data.triple(store,
+  rrdf::add.data.triple(store,
                   subject=supply_table,
                   predicate = "http://bonsai.uno/data/FORWAST/Property/Country",
                   data = country)
   
-  add.data.triple(store,
+  rrdf::add.data.triple(store,
                   subject=supply_table,
                   predicate = "http://bonsai.uno/data/FORWAST/Property/Year",
                   data = paste0(as.character(year), "^^xsd:integer"))
@@ -55,27 +59,27 @@ supply_table_to_rdf <- function(store, country, year, file_name, sheet_name, cel
     product = supply_df$product[i]
     activity = supply_df$activity[i]
     
-    add.triple(store,
+    rrdf::add.triple(store,
                subject=subject,
                predicate = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
                object = "http://bonsai.uno/data/FORWAST/TableCell")
     
-    add.data.triple(store,
+    rrdf::add.data.triple(store,
                     subject=subject,
                     predicate = "http://bonsai.uno/data/FORWAST/Property/Value",
                     data = paste0(as.character(value), "^^xsd:double"))
     
-    add.triple(store,
+    rrdf::add.triple(store,
                subject=subject,
                predicate = "http://bonsai.uno/data/FORWAST/Property/SupplyTable",
                object = supply_table)
     
-    add.triple(store,
+    rrdf::add.triple(store,
                subject=subject,
                predicate = "http://bonsai.uno/data/FORWAST/Property/Product",
                object = product)
     
-    add.triple(store,
+    rrdf::add.triple(store,
                subject=subject,
                predicate = "http://bonsai.uno/data/FORWAST/Property/Activity",
                object = activity)

@@ -1,0 +1,71 @@
+files:
+  - url: http://forwast.brgm.fr/Documents/Deliverables/Forwast_D32_databasesWP3_1(Austria+Denmark).zip
+    spreadsheets:
+    - name: 'Austria Supply_and_Use_Table_Master_9_RMA_20100202(3).xls'
+      dim: 117
+    - name: 'DK Supply and Use Table Master 12 (117x117) 20090915.xls'
+      dim: 117
+  - url: http://forwast.brgm.fr/Documents/Deliverables/Forwast_D32_databasesWP3_2(France+Germany).zip
+    spreadsheets:
+    - name: 'Fr_Supply and Use Table Master 11_06_10_2009.xls'
+      dim: 117
+    - name: 'GER_Supply_and_Use_Table_Master_9_ISWA.xls'
+      dim: 117
+  - url: http://forwast.brgm.fr/Documents/Deliverables/Forwast_D42_DatabasesWP4_1(BE+BU+CY).zip
+    spreadsheets:
+    - name: 'Belgium Supply and Use Table Master 11 (57x57) 20090827.xls'
+      dim: 57
+    - name: 'BU_Supply and Use Table Master 11 (57x57)_30_09_2009.xls'
+      dim: 57
+    - name: 'CYPRUS- Supply and Use Table Master 11_(57x57).xls'
+      dim: 57
+  - url: http://forwast.brgm.fr/Documents/Deliverables/Forwast_D42_DatabasesWP4_2((CZ+SL+HU)+(EE+LV+LT)+FI).zip
+    spreadsheets:
+    - name: 'CZECH-SLOVAKIA-HUNGARY-Master 11 (57x57) 25.06.2009.xls'
+      dim: 57
+    - name: 'EE-LV-LT Master 11(57x57) 19.10.2009.xls'
+      dim: 57
+    - name: 'FINLAND Supply and Use Table Master 11 57x57 5.10.2009.xls'
+      dim: 57
+  - url: http://forwast.brgm.fr/Documents/Deliverables/Forwast_D42_DatabasesWP4_3(GR+LU+MT).zip
+    spreadsheets:
+    - name: 'GREECE-Supply and Use Table Master 11 (117x117)(21-10-2009).xls'
+      dim: 117
+    - name: 'LUxembourg_Supply and Use Table Master 11 (57x57).xls'
+      dim: 57
+    - name: 'MALTA_Supply and Use Table Master 11 (57x57).xls'
+      dim: 57
+  - url: http://forwast.brgm.fr/Documents/Deliverables/Forwast_D42_DatabasesWP4_4(NL+PL).zip
+    spreadsheets:
+    - name: 'NL_Supply and Use Table Master 11_30_09_2009.xls'
+      dim: 117
+    - name: 'POLAND Master 11_ 15.04.2009.xls'
+      dim: 117
+  - url: http://forwast.brgm.fr/Documents/Deliverables/Forwast_D42_DatabasesWP4_5(PT+RO+SW).zip
+    spreadsheets:
+    - name: 'PORTUGAL-Supply and Use Table Master 11 (57x57)(02-10-2009).xls'
+      dim: 57
+    - name: 'RO_Supply and Use Table Master 11 (57x57)_30_09_2009.xls'
+      dim: 57
+    - name: 'Sweden Supply and Use Table Master 12 (117x117)20090901.xls'
+      dim: 117
+  - url: http://forwast.brgm.fr/Documents/Deliverables/Forwast_D42_DatabasesWP4_NV1(IR+IT).zip
+    spreadsheets:
+    - name: 'IRL Supply and Use Master 9 ISWA 10E06.xls'
+      dim: 117
+    - name: 'ITaly Supply and Use Master 11 (57x57).xls'
+      dim: 57
+  - url: http://forwast.brgm.fr/Documents/Deliverables/Forwast_D42_DatabasesWP4_NV2(SL+SP+UK).zip
+    spreadsheets:
+    - name: 'Slovenia Supply_and_Use_Table_Master_9_RMA_2009_09_17.xls'
+      dim: 117
+    - name: 'Spain SUT 04112009.xls'
+      dim: 117
+    - name: 'UK Supply and Use Master 9 ISWA 10E05.xls'
+      dim: 117
+
+
+
+
+
+
