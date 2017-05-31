@@ -1,7 +1,7 @@
 activities_to_rdf <- function(store, file_name, sheet_name, cell_range_activity_names, cell_range_activity_numbers, prefixes){
 
   activity_prefix = prefixes$activity_prefix
-    
+  
   activity_names = read_xls(file_name, 
                             sheet=sheet_name, 
                             range=cell_range_activity_names, 
@@ -16,7 +16,7 @@ activities_to_rdf <- function(store, file_name, sheet_name, cell_range_activity_
 
   for (activity_number in sequence(activity_numbers)){
     
-    subject = paste0(product_prefix, activity_number)
+    subject = paste0(activity_prefix, activity_number)
     
     add.data.triple(store,
                     subject=subject,

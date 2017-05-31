@@ -16,72 +16,89 @@ use_table_to_rdf <- function(store, country, year, file_name, sheet_name, cell_r
   } else {
     stop("Not sure which type of use table (monetary or physical) will be processed")
   }
-
-  use_table = readxl::read_xls(file_name, sheet=sheet_name, range=cell_range, col_names=FALSE)
-  non_zero_indices_use_table = which(use_table != 0, arr.ind=TRUE)
   
-  # data frame representing non-zero values in the use table
-  use_df = data.frame(product = paste0(product_prefix, non_zero_indices_use_table[,1]), 
-                      activity = paste0(activity_prefix, non_zero_indices_use_table[,2]), 
-                      cell_id = paste0("http://bonsai.uno/data/FORWAST/", 
-                                       country, "/", 
-                                       year, "/", 
-                                       use_table_type, 
-                                       "/Product/",non_zero_indices_use_table[,1],
-                                       "/Activity/", non_zero_indices_use_table[,2]), 
-                      value = as.matrix(use_table)[non_zero_indices_use_table])
+  # sheet names may have upper case and lower case variants: "T dry" and "T Dry"
+  # make sure that we can match on both
+  sheet_index = which(tolower(excel_sheets(file_name)) == tolower(sheet_name))
   
-  use_table = paste0("http://bonsai.uno/data/FORWAST/", 
-                     country, "/", 
-                     year, "/", 
-                     use_table_type)
+  use_table = readxl::read_xls(file_name, sheet=sheet_index, range=cell_range, col_names=FALSE)
   
-  rrdf::add.triple(store,
-             subject=use_table,
-             predicate = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-             object = paste0("http://bonsai.uno/data/FORWAST/", use_table_type))
-  
-  rrdf::add.data.triple(store,
-                  subject=use_table,
-                  predicate = "http://bonsai.uno/data/FORWAST/Property/Country",
-                  data = country)
-  
-  rrdf::add.data.triple(store,
-                  subject=use_table,
-                  predicate = "http://bonsai.uno/data/FORWAST/Property/Year",
-                  data = paste0(as.character(year), "^^xsd:integer"))
-  
-  for (i in sequence(nrow(use_df))){
-    subject = use_df$cell_id[i]
-    value = use_df$value[i]
-    product = use_df$product[i]
-    activity = use_df$activity[i]
+  if (nrow(use_table) > 0){
     
-    rrdf::add.triple(store,
-               subject=subject,
-               predicate = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-               object = "http://bonsai.uno/data/FORWAST/TableCell")
+    non_zero_indices_use_table = which(use_table != 0, arr.ind=TRUE)
     
-    rrdf::add.data.triple(store,
-                    subject=subject,
-                    predicate = "http://bonsai.uno/data/FORWAST/Property/Value",
-                    data = paste0(as.character(value), "^^xsd:double"))
+    if (nrow(non_zero_indices_use_table) > 0){
+      
+      
+      
+      # data frame representing non-zero values in the use table
+      use_df = data.frame(product = paste0(product_prefix, non_zero_indices_use_table[,1]), 
+                          activity = paste0(activity_prefix, non_zero_indices_use_table[,2]), 
+                          cell_id = paste0("http://bonsai.uno/data/FORWAST/", 
+                                           country, "/", 
+                                           year, "/", 
+                                           use_table_type, 
+                                           "/Product/",non_zero_indices_use_table[,1],
+                                           "/Activity/", non_zero_indices_use_table[,2]), 
+                          value = as.matrix(use_table)[non_zero_indices_use_table])
+      
+      use_table = paste0("http://bonsai.uno/data/FORWAST/", 
+                         country, "/", 
+                         year, "/", 
+                         use_table_type)
+      
+      rrdf::add.triple(store,
+                       subject = use_table,
+                       predicate = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                       object = paste0("http://bonsai.uno/data/FORWAST/", use_table_type))
+      
+      rrdf::add.data.triple(store,
+                            subject=use_table,
+                            predicate = "http://bonsai.uno/data/FORWAST/Property/Country",
+                            data = country)
+      
+      rrdf::add.data.triple(store,
+                            subject=use_table,
+                            predicate = "http://bonsai.uno/data/FORWAST/Property/Year",
+                            data = paste0(as.character(year), "^^xsd:integer"))
+      
+      for (i in sequence(nrow(use_df))){
+        subject = use_df$cell_id[i]
+        value = use_df$value[i]
+        product = use_df$product[i]
+        activity = use_df$activity[i]
+        
+        rrdf::add.triple(store,
+                         subject=subject,
+                         predicate = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
+                         object = "http://bonsai.uno/data/FORWAST/TableCell")
+        
+        rrdf::add.data.triple(store,
+                              subject=subject,
+                              predicate = "http://bonsai.uno/data/FORWAST/Property/Value",
+                              data = paste0(as.character(value), "^^xsd:double"))
+        
+        rrdf::add.triple(store,
+                         subject=subject,
+                         predicate = "http://bonsai.uno/data/FORWAST/Property/UseTable",
+                         object = use_table)
+        
+        rrdf::add.triple(store,
+                         subject=subject,
+                         predicate = "http://bonsai.uno/data/FORWAST/Property/Product",
+                         object = product)
+        
+        rrdf::add.triple(store,
+                         subject=subject,
+                         predicate = "http://bonsai.uno/data/FORWAST/Property/Activity",
+                         object = activity)
+      }
+    } else {
+      warning(paste("No non-zero data found for table - file:", file_name, ", sheet:", sheet_name, ", country:", country))
+    }   
     
-    rrdf::add.triple(store,
-               subject=subject,
-               predicate = "http://bonsai.uno/data/FORWAST/Property/UseTable",
-               object = use_table)
-    
-    rrdf::add.triple(store,
-               subject=subject,
-               predicate = "http://bonsai.uno/data/FORWAST/Property/Product",
-               object = product)
-    
-    rrdf::add.triple(store,
-               subject=subject,
-               predicate = "http://bonsai.uno/data/FORWAST/Property/Activity",
-               object = activity)
+  } else {
+    warning(paste("No data found for table - file:", file_name, ", sheet:", sheet_name, ", country:", country))
   }
-  
   return(store)
 }

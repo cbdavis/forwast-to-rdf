@@ -28,7 +28,9 @@ products_to_rdf <- function(store, file_name, sheet_name, cell_range_product_nam
                     predicate = "http://www.w3.org/2004/02/skos/core#prefLabel",
                     data = product_names[index])
     
-    object = object = paste0(nace_prefix, item)
+    item = nace_link[index]
+    
+    object = paste0(nace_prefix, item)
     
     add.triple(store,
                subject=subject,
