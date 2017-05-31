@@ -1,8 +1,3 @@
-#never ever convert strings to factors
-options(stringsAsFactors = FALSE)
-
-library(SPARQL)
-
 # want to add in prefixes where possible
 addInPrefixes <- function(df, prefixes){
   # do a search and replace
@@ -21,7 +16,7 @@ addPrefixesToQuery <- function(prefixString, queryString){
   return(paste(prefixString, queryString, sep="\n"))
 }
 
-getAllSubjectTypes <- function(endpoint, prefixes){
+getAllSubjectTypes <- function(endpoint, prefixString){
   queryString = addPrefixesToQuery(prefixString, 
                                    "select ?subjectType (count(?subjectType) as ?subjectTypeCount) where {
                                    ?s rdf:type ?subjectType
@@ -32,7 +27,7 @@ getAllSubjectTypes <- function(endpoint, prefixes){
   return(df)    
 }
 
-getAllDataTypeProperties <- function(endpoint, prefixes, subjectType){
+getAllDataTypeProperties <- function(endpoint, prefixString, subjectType){
   queryString = addPrefixesToQuery(prefixString, 
                                    paste0("select ?p (count(?p) as ?count) (?dataType as ?object) where {
                                     BIND(<", subjectType, "> as ?subjectType) . 
@@ -50,7 +45,7 @@ getAllDataTypeProperties <- function(endpoint, prefixes, subjectType){
   return(df)    
 }
 
-getAllObjectProperties <- function(endpoint, prefixes, subjectType){
+getAllObjectProperties <- function(endpoint, prefixString, subjectType){
   queryString = addPrefixesToQuery(prefixString, 
                                    paste0("select ?p (count(?p) as ?count) (?objType as ?object) where {
                                             BIND(<", subjectType, "> as ?subjectType) . 
@@ -72,73 +67,78 @@ makeLinkPort <- function(text){
   return(text)
 }
 
-endpoint = "http://localhost:9999/blazegraph/sparql"
+visualize_rdf <- function(endpoint = "http://localhost:9999/blazegraph/sparql"){
 
-prefixes = c()
-prefixes["rdfs"] = "http://www.w3.org/2000/01/rdf-schema#"
-prefixes["rdf"] = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
-prefixes["skos"] = "http://www.w3.org/2004/02/skos/core#"
-prefixes["fw"] = "http://bonsai.uno/data/FORWAST"
-prefixes["fwprop"] = "http://bonsai.uno/data/FORWAST/Property/"
-
-prefixString = paste("PREFIX ", names(prefixes), ": <", prefixes, ">\n", collapse="", sep="")
-
-# figure out how many objects we have for each type of subject count
-subjectTypesAndCounts = getAllSubjectTypes(endpoint, prefixes)
-
-table_text = 'digraph G {\nrankdir=LR\nsize="50,50"\n\n'
-
-for (i in sequence(nrow(subjectTypesAndCounts))){
-  subjectType = subjectTypesAndCounts$subjectType[i]
-  subjectCount = subjectTypesAndCounts$subjectTypeCount[i]
-
-  print(subjectType)
+  prefixes = c()
+  prefixes["rdfs"] = "http://www.w3.org/2000/01/rdf-schema#"
+  prefixes["rdf"] = "http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+  prefixes["skos"] = "http://www.w3.org/2004/02/skos/core#"
+  prefixes["fw"] = "http://bonsai.uno/data/FORWAST"
+  prefixes["fwprop"] = "http://bonsai.uno/data/FORWAST/Property/"
+  
+  prefixString = paste("PREFIX ", names(prefixes), ": <", prefixes, ">\n", collapse="", sep="")
+  
+  # figure out how many objects we have for each type of subject count
+  subjectTypesAndCounts = getAllSubjectTypes(endpoint, prefixString)
+  
+  subjectTypes = subjectTypesAndCounts$subjectType
+  
+  table_text = 'digraph G {\nrankdir=LR\nsize="50,50"\n\n'
+  
+  for (i in sequence(nrow(subjectTypesAndCounts))){
+    subjectType = subjectTypesAndCounts$subjectType[i]
+    subjectCount = subjectTypesAndCounts$subjectTypeCount[i]
     
-  table_text = paste0(table_text, "node [shape=plaintext]\n",
-                      '"', makeLinkPort(subjectType), '" [label=<\n',
-                      '<TABLE border="0" cellborder="1" cellspacing="0">\n',
-                      '<tr>',
-                      '<td colspan="3" port="', makeLinkPort(subjectType), '" bgcolor="yellow">',
-                      subjectType, ' (Count: ', as.character(as.numeric(subjectCount)), ')',
-                      '</td></tr>\n',
-                      '<tr><td colspan="3" port="PROPERTIES" bgcolor="pink">PROPERTIES</td></tr>\n', 
-                      '<tr>',
-                      '<td><FONT FACE="Times-Italic">Count</FONT></td>',
-                      '<td><FONT FACE="Times-Italic">Name</FONT></td>',
-                      '<td><FONT FACE="Times-Italic">Type</FONT></td>',
-                      '</tr>\n')
-  
-  df1 = getAllDataTypeProperties(endpoint, prefixes, subjectType)
-  df2 = getAllObjectProperties(endpoint, prefixes, subjectType)
-  df = rbind(df1, df2)
-  
-  linkText = ""
-  
-  for (j in sequence(nrow(df))){
-    print(paste0("     ", df$p[j]))
-    table_text = paste0(table_text, '<tr>', 
-                        '<td>', as.character(as.numeric(df$count[j])), '</td>', 
-                        '<td ALIGN="LEFT">', df$p[j], '</td>', 
-                        '<td port="', makeLinkPort(df$p[j]), '">', df$object[j], '</td>', 
+    print(subjectType)
+    
+    table_text = paste0(table_text, "node [shape=plaintext]\n",
+                        '"', makeLinkPort(subjectType), '" [label=<\n',
+                        '<TABLE border="0" cellborder="1" cellspacing="0">\n',
+                        '<tr>',
+                        '<td colspan="3" port="', makeLinkPort(subjectType), '" bgcolor="yellow">',
+                        subjectType, ' (Count: ', as.character(as.numeric(subjectCount)), ')',
+                        '</td></tr>\n',
+                        '<tr><td colspan="3" port="PROPERTIES" bgcolor="pink">PROPERTIES</td></tr>\n', 
+                        '<tr>',
+                        '<td><FONT FACE="Times-Italic">Count</FONT></td>',
+                        '<td><FONT FACE="Times-Italic">Name</FONT></td>',
+                        '<td><FONT FACE="Times-Italic">Type</FONT></td>',
                         '</tr>\n')
     
-    if (df$object[j] %in% subjectTypes){
-      linkText = paste0(linkText, 
-                        makeLinkPort(subjectType), ':', makeLinkPort(df$p[j]), ' -> ', 
-                        makeLinkPort(df$object[j]), ":", makeLinkPort(df$object[j]), '\n')
+    df1 = getAllDataTypeProperties(endpoint, prefixString, subjectType)
+    df2 = getAllObjectProperties(endpoint, prefixString, subjectType)
+    df = rbind(df1, df2)
+    
+    linkText = ""
+    
+    for (j in sequence(nrow(df))){
+      print(paste0("     ", df$p[j]))
+      table_text = paste0(table_text, '<tr>', 
+                          '<td>', as.character(as.numeric(df$count[j])), '</td>', 
+                          '<td ALIGN="LEFT">', df$p[j], '</td>', 
+                          # TODO ports need to be defined as combinations of predicates and objects
+                          # otherwise have issue when the same predicate may point to different objects
+                          '<td port="', makeLinkPort(df$p[j]), '">', df$object[j], '</td>', 
+                          '</tr>\n')
+      
+      if (df$object[j] %in% subjectTypes){
+        linkText = paste0(linkText, 
+                          makeLinkPort(subjectType), ':', makeLinkPort(df$p[j]), ' -> ', 
+                          makeLinkPort(df$object[j]), ":", makeLinkPort(df$object[j]), '\n')
+      }
+      
     }
-
+    
+    table_text = paste0(table_text, '</TABLE>>];\n\n')
+    table_text = paste0(table_text, linkText)
+    table_text = paste0(table_text, '\n\n')
+    
   }
-
-  table_text = paste0(table_text, '</TABLE>>];\n\n')
-  table_text = paste0(table_text, linkText)
-  table_text = paste0(table_text, '\n\n')
   
+  table_text = paste0(table_text, '}\n')
+  
+  write(table_text, file="forwast.dot")
+  
+  # run this to generate the schema visualization
+  # dot -Tpng -o forwast.png forwast.dot
 }
-
-table_text = paste0(table_text, '}\n')
-
-write(table_text, file="/home/cbdavis/Desktop/forwast.dot")
-
-# run this to generate the schema visualization
-# dot -Tpng -o forwast.png forwast.dot

@@ -12,4 +12,5 @@ Depends:
     dplyr, 
     tidyr, 
     rrdf,
-    yaml
+    yaml, 
+    SPARQL
