@@ -29,3 +29,8 @@ $ wget 'http://downloads.sourceforge.net/project/bigdata/bigdata/2.1.4/blazegrap
 $ java -server -Xmx4g -jar blazegraph.jar
 $ curl -X POST -H 'Content-Type:application/x-turtle' --data-binary '@forwast.ttl' http://localhost:9999/blazegraph/sparql
 ```
+
+Delete all triples
+```
+$ curl -X POST http://localhost:9999/blazegraph/sparql --data-urlencode 'update=DROP ALL;'
+```
