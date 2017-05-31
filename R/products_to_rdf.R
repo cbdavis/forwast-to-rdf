@@ -63,8 +63,8 @@ products_to_rdf <- function(store, file_name, sheet_name, cell_range_product_nam
     add.triple(store,
                subject = subject,
                predicate = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-               object = product_prefix)
-
+               object = gsub("/$", "", product_prefix))
+    
     link_text = nace_link[index]
     items = unlist(strsplit(link_text, "\\+"))
     for (item in items){

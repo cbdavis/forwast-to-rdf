@@ -32,7 +32,7 @@ activities_to_rdf <- function(store, file_name, sheet_name, cell_range_activity_
     add.triple(store,
                subject = subject,
                predicate = "http://www.w3.org/1999/02/22-rdf-syntax-ns#type",
-               object = activity_prefix)
+               object = gsub("/$", "", activity_prefix))
     
   }
   return(store)
